@@ -16,8 +16,6 @@ repositories {
     maven("https://oss.sonatype.org/content/groups/public/")
     // Configurate and math
     maven("https://repo.spongepowered.org/maven")
-    // Configurate-serialization
-    maven("https://jitpack.io")
 }
 
 dependencies {
