@@ -1,0 +1,3 @@
+[submodule "bending-api"]
+	path = bending-api
+	url = https://github.com/ExpanseMC/bending-api.git

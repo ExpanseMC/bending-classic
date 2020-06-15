@@ -1,0 +1,9 @@
+name: BendingClassic
+version: 1.0.0
+api-version: 1.13
+main: com.expansemc.bending.classic.BendingClassic
+description: Classic bending abilities brought up to modern standards.
+load: STARTUP
+author: doot
+website: https://expansemc.com
+depend: [Bending]
