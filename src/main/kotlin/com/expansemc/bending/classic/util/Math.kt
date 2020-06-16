@@ -1,8 +1,7 @@
 package com.expansemc.bending.classic.util
 
 import com.expansemc.bending.api.ray.FastRaycast
-import com.expansemc.bending.api.util.forExclusive
-import com.expansemc.bending.api.util.forInclusive
+import com.expansemc.bending.api.util.step
 import org.bukkit.Location
 import org.bukkit.util.Vector
 import kotlin.math.cos
@@ -11,12 +10,13 @@ import kotlin.math.sin
 fun getSphereDirections(thetaMin: Double, thetaMax: Double, angleTheta: Double, anglePhi: Double): Array<Vector> {
     val directions = ArrayList<Vector>()
 
-    forInclusive(from = thetaMin, to = thetaMax, step = angleTheta) { theta: Double ->
+    for (theta: Double in thetaMin..thetaMax step angleTheta) {
         val sinTheta: Double = sin(Math.toRadians(theta))
         val cosTheta: Double = cos(Math.toRadians(theta))
 
         val deltaPhi: Double = anglePhi / sinTheta
-        forExclusive(from = 0.0, to = 360.0, step = deltaPhi) { phi: Double ->
+
+        for (phi: Double in 0.0..360.0 step deltaPhi) {
             val sinPhi: Double = sin(Math.toRadians(phi))
             val cosPhi: Double = cos(Math.toRadians(phi))
 

@@ -3,9 +3,8 @@ package com.expansemc.bending.classic.ability
 import com.expansemc.bending.api.ability.Ability
 import com.expansemc.bending.api.ability.AbilityExecutionTypes.FALL
 import com.expansemc.bending.api.ability.AbilityExecutionTypes.LEFT_CLICK
+import com.expansemc.bending.api.ability.AbilityExecutionTypes.PASSIVE
 import com.expansemc.bending.api.ability.AbilityExecutionTypes.SNEAK
-import com.expansemc.bending.api.ability.AbilityExecutionTypes.SPRINT_OFF
-import com.expansemc.bending.api.ability.AbilityExecutionTypes.SPRINT_ON
 import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.element.Elements.AIR
 import com.expansemc.bending.api.element.Elements.FIRE
@@ -21,7 +20,7 @@ object ClassicAbilityTypes {
         .key(bending("air_agility"))
         .name("AirAgility")
         .element(AIR)
-        .executionTypes(SPRINT_ON, SPRINT_OFF)
+        .executionTypes(PASSIVE)
         .loader(AirAgilityAbility.serializer())
         .build()
 
@@ -102,6 +101,14 @@ object ClassicAbilityTypes {
         )
         .build()
 
+    val AIR_TORNADO: AbilityType = AbilityType.builder()
+        .key(bending("air_tornado"))
+        .name("AirTornado")
+        .element(AIR)
+        .executionTypes(SNEAK)
+        .loader(AirTornadoAbility.serializer())
+        .build()
+
     val FIRE_BLAST: AbilityType = AbilityType.builder()
         .key(bending("fire_blast"))
         .name("FireBlast")
@@ -151,7 +158,7 @@ object ClassicAbilityTypes {
         .build()
 
     val types: Array<AbilityType> = arrayOf(
-        AIR_AGILITY, AIR_BLAST, AIR_BURST, AIR_SHIELD, AIR_SPOUT, AIR_SWIPE,
+        AIR_AGILITY, AIR_BLAST, AIR_BURST, AIR_SHIELD, AIR_SPOUT, AIR_SWIPE, AIR_TORNADO,
         FIRE_BLAST, FIRE_BURST, FIRE_COMBUSTION, FIRE_JET, FIRE_SHIELD, FIRE_WALL
     )
 

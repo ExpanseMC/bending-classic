@@ -141,10 +141,10 @@ data class AirShieldAbility(
     }
 
     private fun calculateRangedOffsets(): Array<Array<Vector3d>> {
-        val angles = createAngleDegMap()
+        val angles: MutableMap<Int, Int> = createAngleDegMap()
         val rangedOffsets = ArrayList<Array<Vector3d>>(this.offsetSize)
 
-        forInclusive(from = this.initialRadius, to = this.maxRadius, step = 0.3) { radius: Double ->
+        for (radius: Double in this.initialRadius..this.maxRadius step 0.3) {
             rangedOffsets.add(calculateOffsets(radius, angles))
         }
 
@@ -175,11 +175,14 @@ data class AirShieldAbility(
     private fun createAngleDegMap(): MutableMap<Int, Int> {
         val angles = HashMap<Int, Int>()
         var angle = 0
-        val di: Int = (2 * this.maxRadius / this.numStreams).toInt()
-        for (i: Int in -this.maxRadius.toInt() + di until this.maxRadius.toInt() step di) {
-            angles[i] = angle
+        val di: Double = 2 * this.maxRadius / this.numStreams
+        for (i: Double in -this.maxRadius + di..this.maxRadius step di) {
+            angles[i.toInt()] = angle
             angle += 90
-            if (angle == 360) angle = 0
+
+            if (angle == 360) {
+                angle = 0
+            }
         }
         return angles
     }

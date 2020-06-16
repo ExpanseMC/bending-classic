@@ -142,7 +142,7 @@ data class AirBlastAbility(
                 spawnParticle(Particle.CLOUD, this@AirBlastAbility.numParticles, 0.275)
 
                 if (Random.nextInt(4) == 0) {
-                    playSound(Sound.ENTITY_CREEPER_HURT, 0.5f, 1.0f)
+                    playSound(Sound.ENTITY_CREEPER_HURT, 1.0f, 1.0f)
                 }
 
                 if (current.block.type.isSolid || current.block.type.isLiquid) {

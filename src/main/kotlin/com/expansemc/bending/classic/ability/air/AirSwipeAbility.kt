@@ -46,7 +46,7 @@ data class AirSwipeAbility(
     private val arcIncrementRadians: Double = Math.toRadians(this.arcIncrementDegrees)
 
     @Transient
-    private val transformationMatrices: Array<Matrix3d> = this.createTransformationMatrices().toTypedArray()
+    private val arcMatrices: Array<Matrix3d> = this.createArcMatrices().toTypedArray()
 
     override val type: AbilityType get() = ClassicAbilityTypes.AIR_SWIPE
 
@@ -57,8 +57,10 @@ data class AirSwipeAbility(
 
         if (executionType == AbilityExecutionTypes.LEFT_CLICK) {
             this.swipe(
-                player, player.eyeLocation,
-                this@AirSwipeAbility.damage, this@AirSwipeAbility.knockback
+                source = player,
+                origin = player.eyeLocation,
+                damage = this@AirSwipeAbility.damage,
+                knockback = this@AirSwipeAbility.knockback
             )
             return
         }
@@ -71,7 +73,7 @@ data class AirSwipeAbility(
                 return
             }
 
-            val elapsed = startTime.elapsedNow()
+            val elapsed: Long = startTime.elapsedNow()
             if (elapsed >= chargeTime) {
                 charged = true
             }
@@ -84,8 +86,10 @@ data class AirSwipeAbility(
                 }
 
                 this.swipe(
-                    player, player.eyeLocation,
-                    this@AirSwipeAbility.damage * factor, this@AirSwipeAbility.knockback * factor
+                    source = player,
+                    origin = player.eyeLocation,
+                    damage = this@AirSwipeAbility.damage * factor,
+                    knockback = this@AirSwipeAbility.knockback * factor
                 )
                 return
             }
@@ -139,7 +143,7 @@ data class AirSwipeAbility(
     }
 
     private fun createRaycasts(origin: Location, direction: Vector): Array<FastRaycast> =
-        this.transformationMatrices.mapToArray { matrix: Matrix3d ->
+        this.arcMatrices.mapToArray { matrix: Matrix3d ->
             FastRaycast(
                 origin = origin,
                 direction = direction.clone().transform(matrix),
@@ -149,10 +153,10 @@ data class AirSwipeAbility(
             )
         }
 
-    private fun createTransformationMatrices(): List<Matrix3d> {
+    private fun createArcMatrices(): List<Matrix3d> {
         val matrices = ArrayList<Matrix3d>()
 
-        forInclusive(from = -this.arcRadians, to = this.arcRadians, step = this.arcIncrementRadians) { angle: Double ->
+        for (angle: Double in -arcRadians..arcRadians step arcIncrementRadians) {
             val sinAngle: Double = sin(angle)
             val cosAngle: Double = cos(angle)
 

@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "com.expansemc"
-version = "0.1.0"
+version = "0.2.0"
 
 repositories {
     mavenCentral()
@@ -28,13 +28,20 @@ dependencies {
     compileOnly("org.spongepowered:configurate-core:3.6.1")
     compileOnly("org.spongepowered:math:2.0.0-SNAPSHOT")
 
-    compileOnly("com.expansemc:bending-api")
+    compileOnly(project(":bending-api"))
 }
 
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 tasks {
+    jar {
+        val bendingApi = project(":bending-api")
+
+        archiveBaseName.set("BendingClassic")
+        archiveVersion.set("v0.2.0-a${bendingApi.properties["version.api"]!!}")
+    }
+
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
