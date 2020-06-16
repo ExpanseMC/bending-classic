@@ -181,7 +181,7 @@ data class AirBurstAbility(
                     damageEntity(test, damage, source)
                 }
 
-                spawnParticle(Particle.CLOUD, this@AirBurstAbility.numSneakParticles, 0.275)
+                spawnParticle(Particle.CLOUD, 2, 0.275)
                 if (Random.nextInt(9) == 0) {
                     playSound(Sound.ENTITY_CREEPER_HURT, 0.5f, 1.0f)
                 }

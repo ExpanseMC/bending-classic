@@ -5,10 +5,7 @@ import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
 import com.expansemc.bending.api.ray.FastRaycast
 import com.expansemc.bending.api.ray.progressAll
-import com.expansemc.bending.api.util.EpochTime
-import com.expansemc.bending.api.util.isLiquid
-import com.expansemc.bending.api.util.isStale
-import com.expansemc.bending.api.util.spawnParticle
+import com.expansemc.bending.api.util.*
 import com.expansemc.bending.classic.BendingClassic
 import com.expansemc.bending.classic.ability.ClassicAbilityTypes
 import com.expansemc.bending.classic.util.ZERO_VECTOR
@@ -95,6 +92,10 @@ data class FireBurstAbility(
             }
 
             if (charged) {
+                if (Random.nextInt(4) == 0) {
+                    player.eyeLocation.playSound(Sound.BLOCK_FURNACE_FIRE_CRACKLE, 1.0f, 0.5f)
+                }
+
                 player.eyeLocation.spawnParticle(
                     particle = Particle.FLAME,
                     count = 3,
@@ -103,6 +104,10 @@ data class FireBurstAbility(
                     offsetZ = Math.random()
                 )
             } else {
+                if (Random.nextInt(4) == 0) {
+                    player.eyeLocation.playSound(Sound.BLOCK_FURNACE_FIRE_CRACKLE, 1.0f, 1.0f)
+                }
+
                 player.eyeLocation.spawnParticle(
                     particle = Particle.SMOKE_NORMAL,
                     count = 4,
@@ -118,6 +123,8 @@ data class FireBurstAbility(
         source: Player, origin: Location, directions: Array<Vector>,
         targetDirection: Vector = ZERO_VECTOR, maxAngle: Double = 0.0
     ) {
+        source.eyeLocation.playSound(Sound.ENTITY_GENERIC_BIG_FALL, 1.0f, 0.0f)
+
         val raycasts: List<FastRaycast> = createSphereRaycasts(
             origin = origin,
             directions = directions,
@@ -165,8 +172,8 @@ data class FireBurstAbility(
                     )
                 }
 
-                spawnParticle(Particle.FLAME, 6, 0.4)
-                if (Random.nextInt(4) == 0) {
+                spawnParticle(Particle.FLAME, 2, 0.4)
+                if (Random.nextInt(7) == 0) {
                     playSound(Sound.BLOCK_FIRE_AMBIENT, 0.5f, 1.0f)
                 }
 
