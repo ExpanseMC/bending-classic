@@ -6,6 +6,8 @@ import com.expansemc.bending.api.ability.AbilityExecutionType
 import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
+import com.expansemc.bending.api.protection.EntityProtectionService
 import com.expansemc.bending.api.util.*
 import com.expansemc.bending.classic.BendingClassic
 import com.expansemc.bending.classic.ability.ClassicAbilityTypes
@@ -80,7 +82,10 @@ data class AirShieldAbility(
 
             // Push entities around.
             for (entity: Entity in origin.getNearbyEntities(curRadius)) {
-                // TODO: pvp protection
+                if (EntityProtectionService.instance.isProtected(player, entity)) {
+                    // Can't bend this entity!
+                    continue
+                }
 
                 val entityLoc: Location = entity.location
 
@@ -98,7 +103,10 @@ data class AirShieldAbility(
 
             // Extinguish nearby fires.
             for (test: Location in origin.getNearbyLocations(curRadius)) {
-                // TODO: block protection
+                if (BlockProtectionService.instance.isProtected(player, test)) {
+                    // Can't bend here!
+                    continue
+                }
 
                 if (test.block.type == Material.FIRE) {
                     test.block.type = Material.AIR
@@ -113,7 +121,10 @@ data class AirShieldAbility(
             for (offset: Vector3d in offsets[index]) {
                 val displayLoc: Location = origin + offset
 
-                // TODO: block protection
+                if (BlockProtectionService.instance.isProtected(player, displayLoc)) {
+                    // Can't bend here!
+                    continue
+                }
 
                 displayLoc.spawnParticle(
                     Particle.CLOUD,

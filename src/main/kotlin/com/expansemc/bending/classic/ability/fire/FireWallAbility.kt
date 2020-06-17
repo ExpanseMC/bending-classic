@@ -6,6 +6,8 @@ import com.expansemc.bending.api.ability.AbilityExecutionType
 import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
+import com.expansemc.bending.api.protection.EntityProtectionService
 import com.expansemc.bending.api.util.*
 import com.expansemc.bending.classic.BendingClassic
 import com.expansemc.bending.classic.ability.ClassicAbilityTypes
@@ -85,7 +87,10 @@ data class FireWallAbility(
                 damageTick++
 
                 for (entity: Entity in origin.getNearbyEntities(damageRadiusCheck.toDouble())) {
-                    // TODO: pvp protection
+                    if (EntityProtectionService.instance.isProtected(player, entity)) {
+                        // Can't bend this entity!
+                        continue
+                    }
 
                     for (location: Location in locations) {
                         if (entity.location.distanceSquared(location) < this@FireWallAbility.wallDistanceSquared) {
@@ -111,7 +116,10 @@ data class FireWallAbility(
             for (h: Int in -this.height..this.height) {
                 val location: Location = (origin + horizontal * w).add(vertical * h)
 
-                // TODO: block protection
+                if (BlockProtectionService.instance.isProtected(player, location)) {
+                    // Can't bend here!
+                    continue
+                }
 
                 result += location
             }

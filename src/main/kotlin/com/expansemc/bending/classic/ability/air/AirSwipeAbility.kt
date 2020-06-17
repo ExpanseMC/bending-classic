@@ -3,6 +3,7 @@ package com.expansemc.bending.classic.ability.air
 import com.expansemc.bending.api.ability.*
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
 import com.expansemc.bending.api.ray.AirRaycast
 import com.expansemc.bending.api.ray.FastRaycast
 import com.expansemc.bending.api.ray.progressAll
@@ -28,8 +29,8 @@ data class AirSwipeAbility(
     override val cooldown: Long,
     val chargeTime: Long,
     val maxChargeFactor: Double,
-    val arcDegrees: Double,
-    val arcIncrementDegrees: Double,
+    val arcDegrees: Int,
+    val arcIncrementDegrees: Int,
     val damage: Double,
     val knockback: Double,
     val radius: Double,
@@ -38,12 +39,6 @@ data class AirSwipeAbility(
     val numParticles: Int,
     val collisionPriority: Int
 ) : CoroutineAbility {
-
-    @Transient
-    private val arcRadians: Double = Math.toRadians(this.arcDegrees)
-
-    @Transient
-    private val arcIncrementRadians: Double = Math.toRadians(this.arcIncrementDegrees)
 
     @Transient
     private val arcMatrices: Array<Matrix3d> = this.createArcMatrices().toTypedArray()
@@ -80,6 +75,7 @@ data class AirSwipeAbility(
 
             if (!player.isSneaking) {
                 val factor: Double = if (charged) {
+                    player.eyeLocation.playSound(Sound.BLOCK_SNOW_STEP, 1.0f, 2.0f)
                     maxChargeFactor
                 } else {
                     maxChargeFactor * (elapsed / chargeTime)
@@ -115,8 +111,11 @@ data class AirSwipeAbility(
 
             // TODO: collision checking
 
-            val anySucceeded: Boolean = raycasts.progressAll {
-                // TODO: block protection
+            val anySucceeded: Boolean = raycasts.progressAll { current: Location ->
+                if (BlockProtectionService.instance.isProtected(source, current)) {
+                    // Can't bend here!
+                    return@progressAll false
+                }
 
                 affectEntities(source, affectedEntities, this@AirSwipeAbility.radius) { test: Entity ->
                     AirRaycast.pushEntity(
@@ -156,9 +155,10 @@ data class AirSwipeAbility(
     private fun createArcMatrices(): List<Matrix3d> {
         val matrices = ArrayList<Matrix3d>()
 
-        for (angle: Double in -arcRadians..arcRadians step arcIncrementRadians) {
-            val sinAngle: Double = sin(angle)
-            val cosAngle: Double = cos(angle)
+        for (angle: Int in -arcDegrees..arcDegrees step arcIncrementDegrees) {
+            val angleRad: Double = Math.toRadians(angle.toDouble())
+            val sinAngle: Double = sin(angleRad)
+            val cosAngle: Double = cos(angleRad)
 
             matrices += Matrix3d(
                 cosAngle, 0.0, -sinAngle,

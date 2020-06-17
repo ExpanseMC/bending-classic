@@ -3,6 +3,7 @@ package com.expansemc.bending.classic.ability.fire
 import com.expansemc.bending.api.ability.*
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
 import com.expansemc.bending.api.ray.FastRaycast
 import com.expansemc.bending.api.ray.progressAll
 import com.expansemc.bending.api.util.*
@@ -29,8 +30,8 @@ data class FireBurstAbility(
     override val cooldown: Long,
     val chargeTime: Long,
     val fireTicks: Int,
-    val angleTheta: Double,
-    val anglePhi: Double,
+    val angleTheta: Int,
+    val anglePhi: Int,
     val blastRadius: Double,
     val damage: Double,
     val knockback: Double,
@@ -43,7 +44,7 @@ data class FireBurstAbility(
     private val maxConeRadians: Double = Math.toRadians(this.maxConeDegrees)
 
     @Transient
-    private val directions: Array<Vector> = getSphereDirections(0.0, 180.0, this.angleTheta, this.anglePhi)
+    private val directions: Array<Vector> = getSphereDirections(0, 180, this.angleTheta, this.anglePhi)
 
     override val type: AbilityType get() = ClassicAbilityTypes.FIRE_BURST
 
@@ -147,7 +148,10 @@ data class FireBurstAbility(
             // TODO: collision checking
 
             val anySucceeded: Boolean = raycasts.progressAll { current: Location ->
-                // TODO: block protection
+                if (BlockProtectionService.instance.isProtected(source, current)) {
+                    // Can't bend here!
+                    return@progressAll false
+                }
 
                 affectLocations(source, affectedLocations, this@FireBurstAbility.blastRadius) { test: Location ->
                     if (curRange < range / 4) {

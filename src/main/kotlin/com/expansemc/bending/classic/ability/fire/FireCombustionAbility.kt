@@ -6,6 +6,7 @@ import com.expansemc.bending.api.ability.AbilityExecutionType
 import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
 import com.expansemc.bending.api.ray.FastRaycast
 import com.expansemc.bending.api.util.isStale
 import com.expansemc.bending.api.util.isWater
@@ -58,6 +59,11 @@ data class FireCombustionAbility(
             }
 
             val succeeded: Boolean = raycast.progress { current: Location ->
+                if (BlockProtectionService.instance.isProtected(player, current)) {
+                    // Can't bend here!
+                    return@progress false
+                }
+
                 spawnParticle(Particle.FIREWORKS_SPARK, 5, Math.random() / 2)
                 spawnParticle(Particle.FLAME, 2, Math.random() / 2)
                 playSound(Sound.ENTITY_FIREWORK_ROCKET_BLAST, 0.5f, 1.0f)

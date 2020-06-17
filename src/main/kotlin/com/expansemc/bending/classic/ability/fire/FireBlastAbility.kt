@@ -6,6 +6,7 @@ import com.expansemc.bending.api.ability.AbilityExecutionType
 import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
 import com.expansemc.bending.api.ray.FastRaycast
 import com.expansemc.bending.api.util.isLiquid
 import com.expansemc.bending.api.util.isStale
@@ -64,7 +65,10 @@ data class FireBlastAbility(
             // TODO: collision checking
 
             val succeeded: Boolean = raycast.progress { current: Location ->
-                // TODO: block protection
+                if (BlockProtectionService.instance.isProtected(player, current)) {
+                    // Can't bend here!
+                    return@progress false
+                }
 
                 affectEntities(player, affectedEntities, radius) { test: Entity ->
                     FireRaycast.pushAndBurn(

@@ -8,6 +8,7 @@ import com.expansemc.bending.api.ability.AbilityExecutionTypes.LEFT_CLICK
 import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
 import com.expansemc.bending.api.ray.AirRaycast
 import com.expansemc.bending.api.ray.FastRaycast
 import com.expansemc.bending.api.ray.progressAll
@@ -41,9 +42,9 @@ data class AirBurstAbility(
     val speed: Double,
     val fallThreshold: Double,
     val numSneakParticles: Int,
-    val angleTheta: Double,
-    val anglePhi: Double,
-    val maxConeDegrees: Double = 30.0,
+    val angleTheta: Int,
+    val anglePhi: Int,
+    val maxConeDegrees: Int,
     val collisionPriority: Int,
     val canCoolLava: Boolean,
     val canOpenDoors: Boolean,
@@ -51,13 +52,13 @@ data class AirBurstAbility(
 ) : CoroutineAbility {
 
     @Transient
-    private val maxConeRadians: Double = Math.toRadians(this.maxConeDegrees)
+    private val maxConeRadians: Double = Math.toRadians(this.maxConeDegrees.toDouble())
 
     @Transient
-    private val fallDirections: Array<Vector> = getSphereDirections(75.0, 105.0, this.angleTheta, this.anglePhi)
+    private val fallDirections: Array<Vector> = getSphereDirections(75, 105, this.angleTheta, this.anglePhi)
 
     @Transient
-    private val sphereDirections: Array<Vector> = getSphereDirections(0.0, 180.0, this.angleTheta, this.anglePhi)
+    private val sphereDirections: Array<Vector> = getSphereDirections(0, 180, this.angleTheta, this.anglePhi)
 
     override val type: AbilityType get() = ClassicAbilityTypes.AIR_BURST
 
@@ -166,8 +167,11 @@ data class AirBurstAbility(
 
             // TODO: collision checking
 
-            val anySucceeded: Boolean = raycasts.progressAll {
-                // TODO: block protection
+            val anySucceeded: Boolean = raycasts.progressAll { current: Location ->
+                if (BlockProtectionService.instance.isProtected(source, current)) {
+                    // Can't bend here!
+                    return@progressAll false
+                }
 
                 affectLocations(source, affectedLocations, this@AirBurstAbility.blastRadius) { test: Location ->
                     AirRaycast.extinguishFlames(test)

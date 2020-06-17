@@ -6,6 +6,8 @@ import com.expansemc.bending.api.ability.AbilityExecutionType
 import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
+import com.expansemc.bending.api.protection.EntityProtectionService
 import com.expansemc.bending.api.util.*
 import com.expansemc.bending.classic.BendingClassic
 import com.expansemc.bending.classic.ability.ClassicAbilityTypes
@@ -82,7 +84,10 @@ data class AirTornadoAbility(
                 origin.y -= 0.1 * curHeight
 
                 for (entity: Entity in origin.getNearbyEntities(curHeight)) {
-                    // TODO: pvp protection
+                    if (EntityProtectionService.instance.isProtected(player, entity)) {
+                        // Can't bend this entity!
+                        continue
+                    }
 
                     val entityY: Double = entity.location.y
                     val factor: Double
@@ -139,7 +144,10 @@ data class AirTornadoAbility(
                     val z: Double = origin.z + timeFactor * factor * curRadius * sin(angleRad)
 
                     val particleLoc = Location(origin.world, x, y, z)
-                    // TODO: block protection
+                    if (BlockProtectionService.instance.isProtected(player, particleLoc)) {
+                        // Can't bend here!
+                        continue
+                    }
 
                     particleLoc.spawnParticle(Particle.CLOUD, 3, 0.4, 0.4, 0.4)
                     if (Random.nextInt(20) == 0) {

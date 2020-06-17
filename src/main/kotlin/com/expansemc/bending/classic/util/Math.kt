@@ -7,18 +7,20 @@ import org.bukkit.util.Vector
 import kotlin.math.cos
 import kotlin.math.sin
 
-fun getSphereDirections(thetaMin: Double, thetaMax: Double, angleTheta: Double, anglePhi: Double): Array<Vector> {
+fun getSphereDirections(thetaMin: Int, thetaMax: Int, angleTheta: Int, anglePhi: Int): Array<Vector> {
     val directions = ArrayList<Vector>()
 
-    for (theta: Double in thetaMin..thetaMax step angleTheta) {
-        val sinTheta: Double = sin(Math.toRadians(theta))
-        val cosTheta: Double = cos(Math.toRadians(theta))
+    for (theta: Int in thetaMin..thetaMax step angleTheta) {
+        val thetaRad: Double = Math.toRadians(theta.toDouble())
+        val sinTheta: Double = sin(thetaRad)
+        val cosTheta: Double = cos(thetaRad)
 
         val deltaPhi: Double = anglePhi / sinTheta
 
         for (phi: Double in 0.0..360.0 step deltaPhi) {
-            val sinPhi: Double = sin(Math.toRadians(phi))
-            val cosPhi: Double = cos(Math.toRadians(phi))
+            val phiRad: Double = Math.toRadians(phi)
+            val sinPhi: Double = sin(phiRad)
+            val cosPhi: Double = cos(phiRad)
 
             directions += Vector(
                 cosPhi * sinTheta,

@@ -9,6 +9,7 @@ import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
 import com.expansemc.bending.api.bender.Bender
+import com.expansemc.bending.api.protection.BlockProtectionService
 import com.expansemc.bending.api.ray.AirRaycast
 import com.expansemc.bending.api.ray.FastRaycast
 import com.expansemc.bending.api.util.getTargetLocation
@@ -120,8 +121,12 @@ data class AirBlastAbility(
 
             // TODO: collision checking
 
+            // Increment ray
             val succeeded: Boolean = raycast.progress { current: Location ->
-                // TODO: block protection
+                if (BlockProtectionService.instance.isProtected(player, current)) {
+                    // Can't bend here!
+                    return@progress false
+                }
 
                 affectLocations(player, affectedLocations, this@AirBlastAbility.radius) { test ->
                     AirRaycast.extinguishFlames(test)
@@ -152,8 +157,8 @@ data class AirBlastAbility(
                 return@progress true
             }
 
+            // End the ability if the ray couldn't advance.
             if (!succeeded) {
-                // End the ability if the ray couldn't advance.
                 return
             }
         }

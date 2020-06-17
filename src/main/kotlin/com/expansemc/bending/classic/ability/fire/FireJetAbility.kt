@@ -6,6 +6,7 @@ import com.expansemc.bending.api.ability.AbilityExecutionType
 import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
 import com.expansemc.bending.api.util.EpochTime
 import com.expansemc.bending.api.util.isLiquid
 import com.expansemc.bending.api.util.isStale
@@ -36,6 +37,11 @@ data class FireJetAbility(
 
         val startTime: EpochTime = EpochTime.now()
         abilityLoopUnsafe {
+            if (BlockProtectionService.instance.isProtected(player, player.location)) {
+                // Can't bend here!
+                return
+            }
+
             if (player.isStale) {
                 // End if the player object is stale.
                 return

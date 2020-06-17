@@ -6,6 +6,8 @@ import com.expansemc.bending.api.ability.AbilityExecutionType
 import com.expansemc.bending.api.ability.AbilityType
 import com.expansemc.bending.api.ability.coroutine.CoroutineAbility
 import com.expansemc.bending.api.ability.coroutine.CoroutineTask
+import com.expansemc.bending.api.protection.BlockProtectionService
+import com.expansemc.bending.api.protection.EntityProtectionService
 import com.expansemc.bending.api.util.*
 import com.expansemc.bending.classic.BendingClassic
 import com.expansemc.bending.classic.ability.ClassicAbilityTypes
@@ -78,7 +80,10 @@ data class FireShieldAbility(
             }
 
             for (test: Location in player.location.getNearbyLocations(radius)) {
-                // TODO: block protection
+                if (BlockProtectionService.instance.isProtected(player, test)) {
+                    // Can't bend here!
+                    continue
+                }
 
                 if (test.block.type == Material.FIRE) {
                     test.block.type = Material.AIR
@@ -87,7 +92,10 @@ data class FireShieldAbility(
             }
 
             for (entity: Entity in player.location.getNearbyEntities(radius)) {
-                // TODO: pvp protection
+                if (EntityProtectionService.instance.isProtected(player, entity)) {
+                    // Can't bend this entity!
+                    continue
+                }
 
                 if (entity is LivingEntity) {
                     if (player.uniqueId == entity.uniqueId) continue
